@@ -1,1 +1,81 @@
-*git clone*
+import pygame
+import sys
+
+pygame.init()
+
+# Configurações da janela
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
+WINDOW_TITLE = "Meu Jogo de Plataforma"
+WINDOW_COLOR = (135, 206, 235)  # Cor do céu (Sky blue)
+
+# Configurações do personagem
+CHARACTER_WIDTH = 40
+CHARACTER_HEIGHT = 60
+CHARACTER_COLOR = (255, 0, 0)  # Cor vermelha
+CHARACTER_SPEED = 5
+JUMP_HEIGHT = 10
+
+# Inicialização da janela
+window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+pygame.display.set_caption(WINDOW_TITLE)
+
+# Posição inicial do personagem
+character_x = WINDOW_WIDTH // 2 - CHARACTER_WIDTH // 2
+character_y = WINDOW_HEIGHT - CHARACTER_HEIGHT
+
+# Variáveis de movimento
+move_left = False
+move_right = False
+is_jumping = False
+jump_count = JUMP_HEIGHT
+
+clock = pygame.time.Clock()
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+        # Verifica pressionamento das teclas
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                move_left = True
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                move_right = True
+            elif event.key == pygame.K_SPACE:
+                if not is_jumping:
+                    is_jumping = True
+
+        # Verifica soltura das teclas
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                move_left = False
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                move_right = False
+
+    # Movimento do personagem
+    if move_left and character_x > 0:
+        character_x -= CHARACTER_SPEED
+    if move_right and character_x < WINDOW_WIDTH - CHARACTER_WIDTH:
+        character_x += CHARACTER_SPEED
+
+    # Simulação do pulo
+    if is_jumping:
+        if jump_count >= -JUMP_HEIGHT:
+            neg = 1
+            if jump_count < 0:
+                neg = -1
+            character_y -= (jump_count ** 2) * 0.25 * neg
+            jump_count -= 1
+        else:
+            is_jumping = False
+            jump_count = JUMP_HEIGHT
+
+    # Desenhar na janela
+    window.fill(WINDOW_COLOR)
+    pygame.draw.rect(window, CHARACTER_COLOR, (character_x, character_y, CHARACTER_WIDTH, CHARACTER_HEIGHT))
+    pygame.display.update()
+
+    clock.tick(60)
